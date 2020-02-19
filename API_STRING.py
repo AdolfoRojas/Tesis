@@ -1,25 +1,29 @@
-#!/usr/bin/env python3.8  
+#!/usr/bin/env python3.8
 ##################################################################
 import sys
 sys.path.append("/usr/local/lib/python2.7/dist-packages")
 from Bio import Entrez
 import re 
 import requests ## python -m pip install requests
-from gprofiler import GProfiler
 ##################################################################
 
 #####rs_ID = input("Inserte rs: ")
 file1 = open(input("Lista de SNP: "), 'r')
 file2 = open('Genes_afectados.txt', 'w+')
+file2.write("Rs\tTipo de Polimorfismo\tGenes afectados\tGene_Id\tGene_name\tGene_Id_2\tGene_name_2\n")
 Lines = file1.readlines()
+Lines = [w.replace('\n', '') for w in Lines]
+print(str(len(Lines)) + " Variantes geneticas a buscar")
+count = 0
 for line in Lines:
     ### a rs10953105 tiene 2 genes uno codificante y el otro no codificante
-    print(line)
+    count+=1
+    print(str(count/len(Lines)*100)+"% de Variantes buscadas ("+ str(count) +" de " + str(len(Lines)) + ")")
     Entrez.email = "adolfo.rh@postqyf.uchile.cl" 
     handle = Entrez.efetch(db="snp", id=line, retmode="text")
     Variant_Type = "N.A."
     NAME = list()
-    GENE_ID = list()
+    GENE_ID = list()    
     for element in handle.readline().strip().split("<"):
         if re.match("SNP_CLASS>\w+", element):
             Variant_Type = element.replace("SNP_CLASS>", "")
@@ -30,18 +34,18 @@ for line in Lines:
             GENE_ID1 = element.replace("GENE_ID>", "")
             GENE_ID.append(GENE_ID1)
     if len(GENE_ID) == 2:
-        file2.write("\t".join([Variant_Type, GENE_ID[0], NAME[0], GENE_ID[1], NAME[1], '\n']))
+        file2.write("\t".join([line, Variant_Type, str(len(GENE_ID)), GENE_ID[0], NAME[0], GENE_ID[1], NAME[1]]) + '\n')
     elif len(GENE_ID) == 1:
-        file2.write("\t".join([Variant_Type, GENE_ID[0], NAME[0], '\n']))
+        file2.write("\t".join([line, Variant_Type, str(len(GENE_ID)), GENE_ID[0], NAME[0]]) + '\n')
     elif len(GENE_ID) > 2:
-        file2.write("Revisar script, aumentar capacidad de busquenda a " + len(GENE_ID), '\n')
+        file2.write(line + "\t" + Variant_Type + "\t" + str(len(GENE_ID)) + "\t" + "Revisar, aumentar capacidad de busquenda" + '\n')
     elif len(GENE_ID) == 0:
-        file2.write(line + " no presenta un gen asociado en dbSNP buscar en otras bases de datos", '\n')
+        file2.write(line + "\t" + "¿Intergenico?, no presenta un gen asociado en dbSNP" + '\n')
     handle.close() 
 
 ##############################  STRING  #########################################
 
-    if len(NAME) != 0:
+    def STRING():
    
         string_api_url = "https://string-db.org/api"
         output_format = "tsv"
@@ -86,6 +90,7 @@ for line in Lines:
             except:
                 pass
                 print("Not found in String")
+    #STRING()
 
 
 
