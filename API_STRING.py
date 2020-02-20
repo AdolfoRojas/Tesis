@@ -8,6 +8,7 @@ import requests ## python -m pip install requests
 ##################################################################
 
 #####rs_ID = input("Inserte rs: ")
+def Gene_anotation():
 file1 = open(input("Lista de SNP: "), 'r')
 file2 = open('Genes_afectados.txt', 'w+')
 file2.write("Rs\tTipo de Polimorfismo\tGenes afectados\tGene_Id\tGene_name\tGene_Id_2\tGene_name_2\n")
@@ -42,11 +43,16 @@ for line in Lines:
     elif len(GENE_ID) == 0:
         file2.write(line + "\t" + "¿Intergenico?, no presenta un gen asociado en dbSNP" + '\n')
     handle.close() 
+Gene_anotation()
 
 ##############################  STRING  #########################################
 
-    def STRING():
-   
+def STRING():
+    
+    file3 = open('Genes_afectados.txt', 'r')
+    file4 = open('Gene_Interactors.txt', 'w+')
+    file4.write("Rs\tTipo de Polimorfismo\tGenes afectados\tGene_Id\tGene_name\tGene_Id_2\tGene_name_2\n") ### Nombre de los encabezados de las columnas
+    Lines2 = file3.readlines()[1:]
         string_api_url = "https://string-db.org/api"
         output_format = "tsv"
         method = "interaction_partners" 
@@ -90,7 +96,7 @@ for line in Lines:
             except:
                 pass
                 print("Not found in String")
-    #STRING()
+    STRING()
 
 
 
